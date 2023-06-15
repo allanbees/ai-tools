@@ -29,10 +29,10 @@ app.post("/chat", async (req: Request, res: Response) => {
       messages: [
         { role: "user", content: "Hello!" },
         { role: "assistant", content: "Hello, how can I assist you today?" },
-        { role: "user", content: req.body.prompt },
+        { role: "user", content: req.body.prompt.content },
       ],
     });
-    res.status(200).send(response.data.choices[0].message.content);
+    res.status(200).send(response.data.choices[0].message);
   } catch (error) {
     res.status(500).send({ error });
   }

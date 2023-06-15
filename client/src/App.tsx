@@ -1,5 +1,5 @@
 import Navbar from './components/Navbar';
-import Chatbot from './pages/chatbot';
+import Chatbot from './pages/Chatbot';
 
 function App() {
   return (
