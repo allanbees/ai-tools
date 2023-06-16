@@ -47,7 +47,7 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="flex flex-col gap-10 text-center h-full">
+    <div className="flex flex-col text-center">
       <ChatArea messages={messages} />
       <ChatInput
         content={prompt}

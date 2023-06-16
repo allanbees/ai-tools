@@ -3,7 +3,7 @@ import Chatbot from './pages/Chatbot';
 
 function App() {
   return (
-    <div>
+    <div className="flex flex-col gap-5">
       <Navbar />
       <Chatbot />
     </div>

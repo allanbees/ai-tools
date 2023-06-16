@@ -15,7 +15,7 @@ const ChatInput = ({
   handleClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
   return (
-    <section className="absolute bottom-0 left-0 w-full border-t md:border-t-0 md:border-transparent md:bg-vert-light-gradient md:!bg-transparent pt-2 md:-left-2">
+    <div className="bottom-0 left-0 w-full border-t md:border-t-0 md:border-transparent md:bg-vert-light-gradient md:!bg-transparent pt-2 md:-left-2 z-10">
       <div className="mx-2 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
         <div className="flex gap-2 w-full py-[10px] flex-grow md:py-4 md:pl-4 relative border border-black/10 bg-white rounded-xl shadow-lg">
           <TextareaAutosize
@@ -34,7 +34,7 @@ const ChatInput = ({
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
