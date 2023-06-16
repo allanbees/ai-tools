@@ -32,6 +32,9 @@ app.post("/chat", async (req: Request, res: Response) => {
         { role: "user", content: req.body.prompt.content },
       ],
     });
+    if (response.statusText !== "OK") {
+      throw new Error(response.statusText);
+    }
     res.status(200).send(response.data.choices[0].message);
   } catch (error) {
     res.status(500).send({ error });

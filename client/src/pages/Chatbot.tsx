@@ -1,5 +1,5 @@
-import { useState, KeyboardEvent } from 'react';
-import { AiOutlineSend } from 'react-icons/ai';
+import { useState } from 'react';
+import { AiOutlineSend, AiOutlineUser, AiOutlineRobot } from 'react-icons/ai';
 import axios from 'axios';
 import TextareaAutosize from 'react-textarea-autosize';
 
@@ -17,55 +17,59 @@ const ChatMessage = (prompt: Prompt) => {
     return `id-${timestamp}-${hexaDecimalString}`;
   };
   const { role, content } = prompt;
-  return role === 'assistant'
-    ? `<div class="bg-gray-100 p-6" id=${generateUniqueID()}>
-    ${content}
-  </div>`
-    : `<div class="p-6" id=${generateUniqueID()}>${content}</div>`;
+  return role === 'assistant' ? (
+    <p className="bg-gray-100 p-6" id={generateUniqueID()}>
+      <AiOutlineRobot />: {content}
+    </p>
+  ) : (
+    <p className="p-6" id={generateUniqueID()}>
+      <AiOutlineUser />: {content}
+    </p>
+  );
 };
 
 const Chatbot = () => {
   const [prompt, setPrompt] = useState<Prompt>({ role: '', content: '' });
+  const [messages, setMessages] = useState<JSX.Element[]>([]);
 
-  const handleSubmit = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (prompt?.content === '') alert('Please enter a message.');
-    if (e.type === 'click') {
-      const chatArea = document.getElementById('chat-area');
-      if (chatArea) {
-        chatArea.innerHTML += ChatMessage({
-          role: prompt.role,
-          content: prompt.content,
-        });
-      }
+  const handleClick = async () => {
+    if (prompt.content === '') {
+      alert('Please enter a message.');
+      return;
     }
-    await axios
-      .post('http://localhost:3000/chat', {
-        prompt: prompt,
-      })
-      .then((res) => {
-        const chatArea = document.getElementById('chat-area');
-        if (chatArea) {
-          chatArea.innerHTML += ChatMessage({
-            role: res.data.role,
-            content: res.data.content,
-          });
-        }
-      });
+    const role = prompt.role;
+    const content = prompt.content;
     setPrompt({ role: '', content: '' });
+
+    let messagesNew = [...messages, ChatMessage({ role, content })];
+    setMessages(messagesNew);
+    const response = await axios.post('http://localhost:3000/chat', {
+      prompt: prompt,
+    });
+    const data = await response.data;
+    messagesNew = [...messagesNew, ChatMessage(data)];
+    setMessages(messagesNew);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      const chatArea = document.getElementById('chat-area');
-      if (chatArea) {
-        chatArea.innerHTML += ChatMessage({
-          role: prompt.role,
-          content: prompt.content,
-        });
+      if (prompt.content === '') {
+        alert('Please enter a message.');
+        return;
       }
+      e.preventDefault();
+      const role = prompt.role;
+      const content = prompt.content;
       setPrompt({ role: '', content: '' });
-      handleSubmit(e);
+
+      let messagesNew = [...messages, ChatMessage({ role, content })];
+      setMessages(messagesNew);
+      const response = await axios.post('http://localhost:3000/chat', {
+        prompt: prompt,
+      });
+      const data = await response.data;
+      messagesNew = [...messagesNew, ChatMessage(data)];
+      setMessages(messagesNew);
     }
   };
 
@@ -73,7 +77,11 @@ const Chatbot = () => {
     <div className="flex flex-col gap-10 text-center h-full">
       <h1 className="text-2xl font-medium">Your AI Chatbot</h1>
       <section className="h-[400px] overflow-y-auto">
-        <div id="chat-area" className="flex flex-col gap-6"></div>
+        <div className="flex flex-col gap-6">
+          {messages.map((message, idx) => (
+            <div key={idx}>{message}</div>
+          ))}
+        </div>
       </section>
       <section className="absolute bottom-0 left-0 w-full border-t md:border-t-0 md:border-transparent md:bg-vert-light-gradient md:!bg-transparent pt-2 md:-left-2">
         <div className="mx-2 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
@@ -89,7 +97,7 @@ const Chatbot = () => {
               onKeyDown={handleKeyDown}
               className="m-0 w-[90%] resize-none border-0 bg-transparent p-0 pr-10 outline-none pl-3 md:pl-0"
             />
-            <button onClick={(e: any) => handleSubmit(e)}>
+            <button onClick={handleClick}>
               <AiOutlineSend />
             </button>
           </div>
